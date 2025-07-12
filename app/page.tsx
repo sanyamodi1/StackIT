@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearch } from '@/lib/SearchContext';
 import QuestionList from '@/components/QuestionList/QuestionList';
 import AskQuestionModal from '@/components/AskQuestionModal/AskQuestionModal';
@@ -20,15 +20,16 @@ type Question = {
 
 // ───────────────────────────────────────── feature tags ──
 const featureOptions = [
-  { key: 'new', label: 'Newest' }, // sorts by date (desc)
-  { key: 'unanswered', label: 'Unanswered' }, // answers === 0
-  { key: 'highVotes', label: '≥ 10 Votes' }, // votes  ≥ 10
-  { key: 'highViews', label: '≥ 100 Views' }, // views  ≥ 100
+  { key: 'new', label: 'Newest' },
+  { key: 'unanswered', label: 'Unanswered' },
+  { key: 'highVotes', label: '≥ 10 Votes' },
+  { key: 'highViews', label: '≥ 100 Views' },
 ] as const;
 type FeatureKey = typeof featureOptions[number]['key'];
 
+const QUESTIONS_PER_PAGE = 5;
+
 export default function Home() {
-  // ───────────────────────────────────────── state ──
   const [questions, setQuestions] = useState<Question[]>([
     {
       id: 1,
@@ -52,14 +53,57 @@ export default function Home() {
       author: 'js_novice',
       createdAt: '2025-07-10',
     },
-    // …more seed questions
+    {
+      id: 3,
+      title: 'Difference between var, let and const?',
+      body: 'When should I use var over let or const?',
+      votes: 12,
+      answers: 1,
+      views: 210,
+      tags: ['javascript', 'es6'],
+      author: 'codelearner',
+      createdAt: '2025-07-01',
+    },
+    {
+      id: 4,
+      title: 'Best way to structure React project?',
+      body: 'Looking for folder structure advice.',
+      votes: 9,
+      answers: 2,
+      views: 95,
+      tags: ['react', 'project-structure'],
+      author: 'react_pro',
+      createdAt: '2025-07-08',
+    },
+    {
+      id: 5,
+      title: 'What is tailwind and should I use it?',
+      body: 'Heard about Tailwind CSS, worth switching from Bootstrap?',
+      votes: 11,
+      answers: 0,
+      views: 130,
+      tags: ['tailwindcss', 'css', 'framework'],
+      author: 'designer23',
+      createdAt: '2025-06-30',
+    },
+    {
+      id: 6,
+      title: 'How do Promises work in JS?',
+      body: 'Still not clear about promise chaining.',
+      votes: 3,
+      answers: 0,
+      views: 40,
+      tags: ['javascript', 'promises'],
+      author: 'asyncawait',
+      createdAt: '2025-07-09',
+    },
   ]);
 
-  const { term: searchTerm } = useSearch(); // ⬅ search term from context
+  const { term: searchTerm } = useSearch();
   const [showAskForm, setShowAskForm] = useState(false);
   const [activeFeatures, setActiveFeatures] = useState<FeatureKey[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // ───────────────────────────────────────── handlers ──
   const toggleFeature = (key: FeatureKey) =>
     setActiveFeatures((prev) =>
       prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key]
@@ -88,7 +132,10 @@ export default function Home() {
     setShowAskForm(false);
   };
 
-  // ───────────────────────────────────────── filtering ──
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeFeatures]);
+
   const searchFiltered = questions.filter((q) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -112,7 +159,12 @@ export default function Home() {
       )
     : featureFiltered;
 
-  // ───────────────────────────────────────── render ──
+  const totalPages = Math.ceil(filteredQuestions.length / QUESTIONS_PER_PAGE);
+  const paginatedQuestions = filteredQuestions.slice(
+    (currentPage - 1) * QUESTIONS_PER_PAGE,
+    currentPage * QUESTIONS_PER_PAGE
+  );
+
   return (
     <div className="min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-6">
@@ -163,10 +215,43 @@ export default function Home() {
 
         {/* list */}
         <QuestionList
-          questions={filteredQuestions}
+          questions={paginatedQuestions}
           onVote={handleVote}
           onTagClick={() => {}}
         />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex justify-center gap-2 flex-wrap">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`px-3 py-1 border rounded ${
+                  currentPage === pageNum ? 'bg-black text-white' : 'bg-white text-black'
+                }`}
+              >
+                {pageNum}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

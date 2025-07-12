@@ -8,9 +8,9 @@ export default function QuestionLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-gray-200">
+    <div className="min-h-screen bg-background text-gray-200">
       {/* ——— Header ——— */}
-      <header className="bg-[#121212] border-b border-gray-700 px-6 py-4 flex items-center justify-between shadow-sm">
+      <header className="bg-background border-b border-gray-700 px-6 py-4 flex items-center justify-between shadow-sm">
 
         <Link
           href="/"
@@ -21,7 +21,7 @@ export default function QuestionLayout({
       </header>
 
       {/* ——— Main content ——— */}
-      <main className="max-w-3xl mx-auto mt-8 px-4 sm:px-6 md:px-8">
+      <main className="max-w-4xl mx-auto mt-8 px-4 sm:px-6 md:px-8">
         {children}
       </main>
     </div>

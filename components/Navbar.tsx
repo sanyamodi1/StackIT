@@ -62,12 +62,12 @@ export default function Navbar() {
 
         {/* right‑side buttons */}
         <div className="flex items-center gap-2">
-          <button
+          <Link href ="/notification"
             aria-label="Notifications"
             className="rounded p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
             <Bell size={20} />
-          </button>
+          </Link>
           <AuthButton />
 
           {/* burger */}
