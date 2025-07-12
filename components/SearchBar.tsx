@@ -9,9 +9,10 @@ export default function SearchBar({ value, onChange, placeholder = 'Search...' }
     <input
       type="text"
       placeholder={placeholder}
-      className="w-full px-4 py-2 border rounded"
+      className="w-full rounded-2xl border border-white/20 bg-black/30 px-4 py-2 text-sm text-white placeholder-white/50 focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition"
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />
   );
 }
+

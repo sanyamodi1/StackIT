@@ -5,19 +5,16 @@ type TagProps = {
 };
 
 export default function Tag({ tag, isActive = false, onClick }: TagProps) {
-  const baseClasses = "px-3 py-1 rounded";
-  const activeClasses = isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-200';
-  
+  const baseClasses = "px-3 py-1 rounded text-sm font-medium transition";
+  const activeClasses = isActive
+    ? "bg-blue-700 text-white"
+    : "bg-gray-800 text-gray-300 hover:bg-gray-700";
+
   return onClick ? (
-    <button
-      onClick={onClick}
-      className={`${baseClasses} ${activeClasses} hover:bg-blue-50`}
-    >
+    <button onClick={onClick} className={`${baseClasses} ${activeClasses}`}>
       {tag}
     </button>
   ) : (
-    <span className={`${baseClasses} ${activeClasses}`}>
-      {tag}
-    </span>
+    <span className={`${baseClasses} ${activeClasses}`}>{tag}</span>
   );
 }
