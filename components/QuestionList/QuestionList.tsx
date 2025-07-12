@@ -1,9 +1,9 @@
-import QuestionCard from "./QuestionCard";
-import { Question } from "@/types";
+import QuestionCard from './QuestionCard';
+import { Question } from '@/types';
 
 type QuestionListProps = {
   questions: Question[];
-  onVote: (id: number, direction: "up" | "down") => void;
+  onVote: (id: string, direction: 'up' | 'down') => void; // ← id is a string
   onTagClick: (tag: string | null) => void;
 };
 

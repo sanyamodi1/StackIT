@@ -3,7 +3,7 @@ import AskQuestionForm from './AskQuestionForm';
 type AskQuestionModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (question: { title: string; body: string; tags: string[] }) => void;
+  onSubmit: (question: { title: string; description: string; tags: string[] }) => void;
 };
 
 export default function AskQuestionModal({ isOpen, onClose, onSubmit }: AskQuestionModalProps) {

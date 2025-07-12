@@ -7,7 +7,7 @@ import CustomInput from "../../components/Custom-input"; // ✅ import the Tipta
 
 type AskQuestionFormProps = {
   onCancel: () => void;
-  onSubmit: (question: { title: string; body: string; tags: string[] }) => void;
+  onSubmit: (question: { title: string; description: string; tags: string[] }) => void;
 };
 
 export default function AskQuestionForm({ onCancel, onSubmit }: AskQuestionFormProps) {
@@ -21,9 +21,10 @@ export default function AskQuestionForm({ onCancel, onSubmit }: AskQuestionFormP
     .filter((tag) => tag.length > 0)
     .slice(0, 5);
 
-  const handleSubmit = () => {
-    onSubmit({ title, body, tags: parsedTags });
-  };
+const handleSubmit = () => {
+  onSubmit({ title, description: body, tags: parsedTags }); // ✅ fix here
+};
+
 
   return (
     <div className="max-h-[80vh] overflow-y-auto text-white">

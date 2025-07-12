@@ -5,7 +5,7 @@ import { Question } from '@/types';
 
 type QuestionCardProps = {
   question: Question;
-  onVote: (id: number, direction: 'up' | 'down') => void;
+  onVote: (id: string, direction: 'up' | 'down') => void; // ✅ id as string
   onTagClick: (tag: string | null) => void;
 };
 
@@ -17,11 +17,8 @@ export default function QuestionCard({
   return (
     <div className="bg-black border border-white rounded-2xl p-4 shadow-sm">
       <div className="flex gap-4">
-        <QuestionStats
-          votes={question.votes}
-          answers={question.answers}
-          views={question.views}
-        />
+        {/* Stats */}
+        <QuestionStats votes={question.votes} answers={question.answers} />
 
         {/* Main column */}
         <div className="flex-1">
@@ -37,7 +34,7 @@ export default function QuestionCard({
 
           {/* Excerpt */}
           <p className="text-gray-300 text-sm mb-2 line-clamp-2">
-            {question.body}
+            {question.description}
           </p>
 
           {/* Tags */}
@@ -60,7 +57,7 @@ export default function QuestionCard({
           </div>
         </div>
 
-        {/* Votes */}
+        {/* Vote Buttons */}
         <VoteButtons
           onUpvote={() => onVote(question.id, 'up')}
           onDownvote={() => onVote(question.id, 'down')}

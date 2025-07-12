@@ -1,78 +1,200 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearch } from '@/lib/SearchContext';
 import QuestionList from '@/components/QuestionList/QuestionList';
 import AskQuestionModal from '@/components/AskQuestionModal/AskQuestionModal';
 
-type Question = {
-  id: number;
+// ─────────────────────────── types and constants
+export type Question = {
+  id: string;               // ← UUIDs are strings
   title: string;
-  body: string;
-  votes: number;
+  description: string;
   answers: number;
-  views: number;
+  votes: number;            // upvotes − downvotes
   tags: string[];
   author: string;
-  createdAt: string;
+  createdAt: string;        // ISO string
 };
 
-type Props = {
+const featureOptions = [
+  { key: 'new',        label: 'Newest' },
+  { key: 'unanswered', label: 'Unanswered' },
+  { key: 'highVotes',  label: '≥ 10 Votes' },
+] as const;
+
+type FeatureKey = (typeof featureOptions)[number]['key'];
+const QUESTIONS_PER_PAGE = 5;
+
+// ─────────────────────────── component
+export default function ClientHome({
+  initialQuestions,
+}: {
   initialQuestions: Question[];
-};
-
-export default function ClientHome({ initialQuestions }: Props) {
+}) {
+  // ───────── state
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const { term: searchTerm } = useSearch();
-  const [showAskForm, setShowAskForm] = useState(false);
 
-  const handleSubmitQuestion = async (q: { title: string; body: string; tags: string[] }) => {
-    const res = await fetch('/api/questions', {
-      method: 'POST',
-      body: JSON.stringify(q),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const newQ = await res.json();
+  const [showAskForm, setShowAskForm]   = useState(false);
+  const [activeFeatures, setActiveFeatures] = useState<FeatureKey[]>([]);
+  const [currentPage, setCurrentPage]   = useState(1);
+
+  // ───────── handlers
+  const toggleFeature = (key: FeatureKey) =>
+    setActiveFeatures((prev) =>
+      prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key],
+    );
+
+  const handleVote = (id: string, dir: 'up' | 'down') =>
+    setQuestions((prev) =>
+      prev.map((q) =>
+        q.id === id
+          ? { ...q, votes: dir === 'up' ? q.votes + 1 : q.votes - 1 }
+          : q,
+      ),
+    );
+
+  const handleSubmitQuestion = (q: {
+    title: string;
+    description: string;
+    tags: string[];
+  }) => {
+    const newQ: Question = {
+      id: crypto.randomUUID(),      // ← generate a UUID string
+      ...q,
+      votes: 0,
+      answers: 0,
+      author: 'current_user',
+      createdAt: new Date().toISOString(),
+    };
     setQuestions((prev) => [newQ, ...prev]);
     setShowAskForm(false);
   };
 
-  const handleVote = async (id: number, dir: 'up' | 'down') => {
-    const res = await fetch(`/api/questions/${id}/vote`, {
-      method: 'POST',
-      body: JSON.stringify({ dir }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const updated = await res.json();
-    setQuestions((prev) => prev.map(q => q.id === id ? updated : q));
-  };
+  // reset to page 1 whenever filters or search change
+  useEffect(() => setCurrentPage(1), [searchTerm, activeFeatures]);
 
-  const filteredQuestions = questions; // You can apply filtering logic here if needed
+  // ───────── searching and filtering
+  const searchFiltered = questions.filter((q) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      q.title.toLowerCase().includes(term) ||
+      q.description.toLowerCase().includes(term) ||
+      q.tags.some((t) => t.toLowerCase().includes(term))
+    );
+  });
 
-  // ✅ Ensure the JSX below is returned
+  const featureFiltered = searchFiltered.filter((q) => {
+    let ok = true;
+    if (activeFeatures.includes('unanswered')) ok &&= q.answers === 0;
+    if (activeFeatures.includes('highVotes')) ok &&= q.votes >= 10;
+    return ok;
+  });
+
+  const sortedQuestions = activeFeatures.includes('new')
+    ? [...featureFiltered].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+    : featureFiltered;
+
+  const totalPages = Math.ceil(sortedQuestions.length / QUESTIONS_PER_PAGE);
+  const paginated = sortedQuestions.slice(
+    (currentPage - 1) * QUESTIONS_PER_PAGE,
+    currentPage * QUESTIONS_PER_PAGE,
+  );
+
+  // ───────── render
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-7xl px-4 py-6">
-        <h1 className="text-2xl font-bold mb-4">Questions</h1>
+        {/* heading */}
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-bold">
+            Welcome to Stack&nbsp;
+            <span className="text-[#ff9696]">It</span> — where bugs meet brains.
+          </h1>
+        </div>
 
-        <button
-          onClick={() => setShowAskForm(true)}
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Ask Question
-        </button>
+        {/* controls row */}
+        <div className="mb-6 flex flex-col gap-4 items-center md:flex-row md:justify-between">
+          {/* feature buttons */}
+          <div className="flex flex-wrap gap-2">
+            {featureOptions.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => toggleFeature(key)}
+                className={`rounded-full border px-3 py-1 text-sm transition ${
+                  activeFeatures.includes(key)
+                    ? 'bg-gray-900 border-white text-white'
+                    : 'bg-white text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
+          {/* ask question */}
+          <button
+            onClick={() => setShowAskForm(true)}
+            className="rounded-full border border-white bg-white px-5 py-2 font-medium text-black transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-white/70"
+          >
+            Ask Question
+          </button>
+        </div>
+
+        {/* modal */}
         <AskQuestionModal
           isOpen={showAskForm}
           onClose={() => setShowAskForm(false)}
           onSubmit={handleSubmitQuestion}
         />
 
+        {/* list */}
         <QuestionList
-          questions={filteredQuestions}
+          questions={paginated}
           onVote={handleVote}
           onTagClick={() => {}}
         />
+
+        {/* pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="rounded border px-3 py-1 disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                onClick={() => setCurrentPage(n)}
+                className={`rounded border px-3 py-1 ${
+                  currentPage === n
+                    ? 'bg-black text-white'
+                    : 'bg-white text-black'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+
+            <button
+              onClick={() =>
+                setCurrentPage((p) => Math.min(p + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="rounded border px-3 py-1 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

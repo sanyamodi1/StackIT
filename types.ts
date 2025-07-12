@@ -1,11 +1,10 @@
 export type Question = {
-  id: number;
+  id: string;
   title: string;
-  body: string;
-  votes: number;
+  description: string;
   answers: number;
-  views: number;
   tags: string[];
   author: string;
   createdAt: string;
+  votes: number;
 };
