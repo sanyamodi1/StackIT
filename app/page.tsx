@@ -1,3 +1,5 @@
+import { getQuestions } from '@/lib/prisma/questions';
+import ClientHome from '@/components/ClientHome';
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -29,6 +31,9 @@ type FeatureKey = typeof featureOptions[number]['key'];
 
 const QUESTIONS_PER_PAGE = 5;
 
+export default async function HomePage() {
+  const questions = await getQuestions(); // fetch from DB
+  return <ClientHome initialQuestions={questions} />;
 export default function Home() {
   const [questions, setQuestions] = useState<Question[]>([
     {
