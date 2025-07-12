@@ -13,7 +13,7 @@ type Props = {
   placeholder?: string;
 };
 
-export default function CustomInput({ value, onChange, placeholder = 'Write your question details here…' }: Props) {
+export default function CustomInput({ value, onChange, placeholder = '' }: Props) {
   const [isReady, setIsReady] = useState(false);
 
   const editor = useEditor({
@@ -87,15 +87,7 @@ export default function CustomInput({ value, onChange, placeholder = 'Write your
       {/* Editable area */}
       <EditorContent editor={editor} />
 
-      {/* Placeholder (TipTap doesn’t offer one natively) */}
-      {editor.isEmpty && (
-        <p
-          className="pointer-events-none absolute z-0 p-4 text-gray-500 select-none"
-          style={{ top: '46px' }}
-        >
-          {placeholder}
-        </p>
-      )}
+     
     </div>
   );
 }
