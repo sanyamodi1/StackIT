@@ -6,6 +6,7 @@ import QuestionList from '@/components/QuestionList/QuestionList';
 import SearchBar from '@/components/SearchBar';
 import TagList from '@/components/TagList/TagList';
 import AskQuestionModal from '@/components/AskQuestionModal/AskQuestionModal';
+import CustomInput from '@/components/Custom-input';
 
 type Question = {
   id: number;
@@ -80,51 +81,52 @@ const handleSubmitQuestion = (newQuestion: { title: string; body: string; tags: 
   const allTags = Array.from(new Set(questions.flatMap(q => q.tags)));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Head>
-        <title>Dev Overflow - Where Developers Learn & Share</title>
-      </Head>
+  <div className="min-h-screen bg-gray-50">
+    <Head>
+      <title>Dev Overflow - Where Developers Learn & Share</title>
+    </Head>
 
-      <Navbar />
+    <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">All Questions</h1>
-          <button
-            onClick={() => setShowAskForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-          >
-            Ask Question
-          </button>
-        </div>
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">All Questions</h1>
+        <button
+          onClick={() => setShowAskForm(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Ask Question
+        </button>
+      </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <SearchBar
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Search questions..."
-            />
-          </div>
-          <TagList
-            tags={allTags}
-            activeTag={activeTag}
-            onTagClick={setActiveTag}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <SearchBar
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Search questions..."
           />
         </div>
-
-        <AskQuestionModal
-          isOpen={showAskForm}
-          onClose={() => setShowAskForm(false)}
-          onSubmit={handleSubmitQuestion}
-        />
-
-        <QuestionList
-          questions={filteredQuestions}
-          onVote={handleVote}
+        <TagList
+          tags={allTags}
+          activeTag={activeTag}
           onTagClick={setActiveTag}
         />
       </div>
+
+      <AskQuestionModal
+        isOpen={showAskForm}
+        onClose={() => setShowAskForm(false)}
+        onSubmit={handleSubmitQuestion}
+      />
+
+      <QuestionList
+        questions={filteredQuestions}
+        onVote={handleVote}
+        onTagClick={setActiveTag}
+      />
     </div>
-  );
+  </div>
+);
+
 }

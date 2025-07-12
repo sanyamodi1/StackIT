@@ -1,13 +1,10 @@
-// app/layout.tsx
-export const metadata = {
-  title: 'StackIt',
-  description: 'Minimal Q&A Platform',
-};
+// app/question/layout.tsx
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function QuestionLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-blue-800 mb-4">📘 StackIt Q&A</h1>
+      <div className="bg-white p-4 rounded shadow">{children}</div>
+    </div>
   );
 }

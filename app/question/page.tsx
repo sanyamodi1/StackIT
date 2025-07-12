@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { questions } from '@/lib/data';
+import { questions } from '@/lib/data.js';
 
 export default function QuestionsPage() {
   return (
@@ -21,3 +21,4 @@ export default function QuestionsPage() {
     </div>
   );
 }
+
