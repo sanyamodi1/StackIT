@@ -120,3 +120,4 @@ export default function CustomInput({ value, onChange, placeholder = 'Write your
     </div>
   );
 }
+
