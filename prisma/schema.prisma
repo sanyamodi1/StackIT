@@ -13,3 +13,53 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           String      @id @default(uuid())
+  name         String      @unique
+  fullName     String
+  email        String      @unique
+  image        String?
+  createdAt    DateTime    @default(now())
+  questions    Question[]
+  answers      Answer[]
+  notifications Notification[]
+}
+
+model Question {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  tags      String[]
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  answers   Answer[]
+}
+
+model Answer {
+  id         String   @id @default(uuid())
+  content    String
+  createdAt  DateTime @default(now())
+  upvotes    Int      @default(0)
+  downvotes  Int      @default(0)
+  isAccepted Boolean  @default(false)
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
