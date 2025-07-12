@@ -1,27 +1,35 @@
-import QuestionCard from './QuestionCard';
-import { Question } from '@/types';
+import QuestionCard from "./QuestionCard";
+import { Question } from "@/types";
 
 type QuestionListProps = {
   questions: Question[];
-  onVote: (id: number, direction: 'up' | 'down') => void;
+  onVote: (id: number, direction: "up" | "down") => void;
   onTagClick: (tag: string | null) => void;
 };
 
-export default function QuestionList({ questions, onVote, onTagClick }: QuestionListProps) {
+export default function QuestionList({
+  questions,
+  onVote,
+  onTagClick,
+}: QuestionListProps) {
+  /* ——— Empty list ——— */
   if (questions.length === 0) {
     return (
-      <div className="text-center py-10">
-        <p className="text-gray-500">No questions found. Be the first to ask!</p>
+      <div className="flex justify-center py-12">
+        <div className="rounded-2xl border border-white px-6 py-8">
+          <p className="text-white">No questions yet — break the silence!</p>
+        </div>
       </div>
     );
   }
 
+  /* ——— Questions ——— */
   return (
     <div className="space-y-4">
-      {questions.map(question => (
+      {questions.map((q) => (
         <QuestionCard
-          key={question.id}
-          question={question}
+          key={q.id}
+          question={q}
           onVote={onVote}
           onTagClick={onTagClick}
         />
